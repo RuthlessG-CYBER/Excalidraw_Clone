@@ -47,6 +47,7 @@ import {
 import { Canvas } from '../components/Canvas'
 import type { Shape } from '../components/Canvas'
 
+const API_URL = "https://excalidraw-backend-wrk7.onrender.com"
 
 interface HomeProps {
   onLogout?: () => void
@@ -116,14 +117,14 @@ const Home = ({ onLogout }: HomeProps) => {
 
   const handleSaveProject = async () => {
     const projectData = {
-      userId: "USER_ID_HERE",
+      userId: undefined,
       shapes,
       zoom,
       pan
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/project/save", {
+      const res = await fetch(`${API_URL}/api/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(projectData)
