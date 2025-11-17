@@ -14,11 +14,22 @@ import { Eye, EyeOff, UserPlus } from "lucide-react"
 
 const API_URL = "https://excalidraw-backend-wrk7.onrender.com"
 
+type SignupUser = {
+  id: string
+  name: string
+  email: string
+}
+
+type SignupResponse = {
+  message?: string
+  user?: SignupUser
+}
+
 export default function SignupPage({
   onSignupSuccess,
   onSwitchToLogin,
 }: {
-  onSignupSuccess?: (user: any) => void
+  onSignupSuccess?: (user: SignupUser) => void
   onSwitchToLogin?: () => void
 }) {
   const [name, setName] = useState("")
@@ -40,13 +51,17 @@ export default function SignupPage({
         body: JSON.stringify({ name, email, password }),
       })
 
-      const data = await response.json()
+      const data: SignupResponse = await response.json()
       if (!response.ok) throw new Error(data.message || "Signup failed")
 
       setSuccess("Account created successfully! You can now log in.")
-      if (onSignupSuccess) onSignupSuccess(data.user)
-    } catch (err: any) {
-      setError(err.message || "Signup failed")
+      if (onSignupSuccess && data.user) onSignupSuccess(data.user)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Signup failed")
+      } else {
+        setError("Signup failed")
+      }
     } finally {
       setLoading(false)
     }

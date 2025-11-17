@@ -130,6 +130,7 @@ const Home = ({ onLogout }: HomeProps) => {
         body: JSON.stringify(projectData)
       });
 
+
       const data = await res.json();
       if (data.success) alert("Saved to backend!");
       else alert("Failed to save!");
@@ -164,9 +165,9 @@ const Home = ({ onLogout }: HomeProps) => {
   return (
     <div className="relative h-screen w-full flex flex-col items-center justify-center bg-gray-50 overflow-hidden">
 
-      <Canvas 
-        activeTool={active} 
-        shapes={shapes} 
+      <Canvas
+        activeTool={active}
+        shapes={shapes}
         onShapesChange={handleShapesChange}
         zoom={zoom}
         pan={pan}
