@@ -14,11 +14,23 @@ import { Eye, EyeOff, LogIn } from "lucide-react"
 
 const API_URL = "https://excalidraw-backend-wrk7.onrender.com"
 
+type LoginUser = {
+  id: string
+  name: string
+  email: string
+}
+
+type LoginResponse = {
+  message?: string
+  token?: string
+  user?: LoginUser
+}
+
 export default function LoginPage({
   onLogin,
   onSignupClick,
 }: {
-  onLogin?: (user: string) => void
+  onLogin?: (user: LoginUser) => void
   onSignupClick?: () => void
 }) {
   const [email, setEmail] = useState("")
@@ -38,12 +50,16 @@ export default function LoginPage({
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const data: LoginResponse = await response.json();
 
       if (!response.ok) throw new Error(data.message || "Invalid credentials");
 
-      localStorage.setItem("token", data.token);
+      if (!data.token || !data.user) {
+        throw new Error("Invalid response from server");
+      }
 
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
       if (onLogin) onLogin(data.user);
 
     } catch (err) {
