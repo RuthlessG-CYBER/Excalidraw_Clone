@@ -3,11 +3,11 @@ import { Button } from '../components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '../components/ui/dropdown-menu'
+
 import {
   AlignJustify,
   Square,
@@ -21,20 +21,10 @@ import {
   MousePointer,
   Lock,
   Hand,
-  FolderOpen,
   Save,
   ImageDown,
-  Users,
-  Command,
-  Search,
   HelpCircle,
   Trash2,
-  Github,
-  ExternalLink,
-  Sun,
-  Moon,
-  Palette,
-  LogIn,
   Sparkles,
   Share2,
   AppWindow,
@@ -44,6 +34,7 @@ import {
   Plus,
   LogOut,
 } from 'lucide-react'
+
 import {
   Dialog,
   DialogContent,
@@ -52,6 +43,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../components/ui/dialog"
+
 import { Canvas } from '../components/Canvas'
 import type { Shape } from '../components/Canvas'
 
@@ -121,8 +113,56 @@ const Home = ({ onLogout }: HomeProps) => {
     }
   }
 
+
+  const handleSaveProject = async () => {
+    const projectData = {
+      userId: "USER_ID_HERE",
+      shapes,
+      zoom,
+      pan
+    };
+
+    try {
+      const res = await fetch("http://localhost:5000/api/project/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(projectData)
+      });
+
+      const data = await res.json();
+      if (data.success) alert("Saved to backend!");
+      else alert("Failed to save!");
+    } catch (err) {
+      console.log(err);
+      alert("Error saving!");
+    }
+  };
+
+
+  const handleExportLocal = () => {
+    const exportData = {
+      shapes,
+      zoom,
+      pan,
+      exportedAt: new Date()
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "excalidraw_project.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+
   return (
     <div className="relative h-screen w-full flex flex-col items-center justify-center bg-gray-50 overflow-hidden">
+
       <Canvas 
         activeTool={active} 
         shapes={shapes} 
@@ -132,100 +172,43 @@ const Home = ({ onLogout }: HomeProps) => {
         onPanChange={setPan}
       />
 
-      {/* Top Toolbar */}
+
+      {/* Top Menu */}
       <div className="absolute top-1 left-0 right-0 flex items-center justify-between z-10">
+
         {/* Left Menu */}
         <div className="flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Menu"
-                className="bg-gray-100 hover:bg-gray-200"
-              >
+              <Button variant="outline" size="icon" className="bg-gray-100 hover:bg-gray-200">
                 <AlignJustify />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent
-              className="w-56 rounded-xl shadow-lg border border-gray-200 bg-white"
-              align="start"
-              sideOffset={8}
-            >
-              <DropdownMenuItem className="flex items-center gap-2">
-                <FolderOpen className="w-4 h-4" /> Open
+            <DropdownMenuContent className="w-56 rounded-xl shadow-lg border bg-white">
+
+              <DropdownMenuItem className="flex items-center gap-2" onClick={handleSaveProject}>
+                <Save className="w-4 h-4" />
+                Save to Backend
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <Save className="w-4 h-4" /> Save to...
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <ImageDown className="w-4 h-4" /> Export image...
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <Users className="w-4 h-4" /> Live collaboration...
+
+              <DropdownMenuItem className="flex items-center gap-2" onClick={handleExportLocal}>
+                <ImageDown className="w-4 h-4" />
+                Export to Local
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="flex items-center gap-2 text-indigo-600 font-medium">
-                <Command className="w-4 h-4" /> Command palette
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <Search className="w-4 h-4" /> Find on canvas
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4" /> Help
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center gap-2 text-red-500"
-                onClick={handleResetCanvas}
-              >
-                <Trash2 className="w-4 h-4" /> Reset the canvas
+              <DropdownMenuItem className="flex items-center gap-2 text-red-500" onClick={handleResetCanvas}>
+                <Trash2 className="w-4 h-4" /> Reset canvas
               </DropdownMenuItem>
 
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem className="flex items-center gap-2">
-                <ExternalLink className="w-4 h-4" /> Excalidraw+
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <Github className="w-4 h-4" /> GitHub
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <ExternalLink className="w-4 h-4" /> Follow us
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <ExternalLink className="w-4 h-4" /> Discord chat
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem className="flex items-center gap-2 text-indigo-600 font-semibold">
-                <LogIn className="w-4 h-4" /> Sign up
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              <DropdownMenuLabel className="text-xs text-gray-500 px-2">
-                Theme
-              </DropdownMenuLabel>
-              <div className="flex items-center justify-between px-3 pb-2">
-                <Button size="icon" variant="ghost" className="rounded-md bg-indigo-100 text-indigo-700">
-                  <Sun className="w-4 h-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="rounded-md hover:bg-gray-100">
-                  <Moon className="w-4 h-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="rounded-md hover:bg-gray-100">
-                  <Palette className="w-4 h-4" />
-                </Button>
-              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        {/* Center Toolbar */}
+
+        {/* Center */}
         <div className="flex items-center gap-1 bg-white border shadow-sm rounded-md px-2 py-1">
           {tools.map((tool) => (
             <Button
@@ -233,132 +216,77 @@ const Home = ({ onLogout }: HomeProps) => {
               variant="ghost"
               size="icon"
               onClick={() => setActive(tool.id)}
-              className={`${active === tool.id
-                ? "bg-indigo-100 text-indigo-700"
-                : "text-gray-600 hover:bg-gray-100"
-                }`}
+              className={active === tool.id ? "bg-indigo-100 text-indigo-700" : "text-gray-600 hover:bg-gray-100"}
             >
               {tool.icon}
             </Button>
           ))}
         </div>
 
-        {/* Right Controls */}
+
+        {/* Right */}
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 text-black bg-gray-100 hover:bg-blue-400 hover:text-white transition-colors duration-300"
-          >
+          <Button className="flex items-center gap-2 bg-gray-100 hover:bg-blue-400 text-black hover:text-white">
             <Sparkles className="w-4 h-4" />
             Excalidraw+
           </Button>
 
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2 text-black bg-gray-100 hover:bg-blue-400 hover:text-white transition-colors duration-300"
-              >
+              <Button className="flex items-center gap-2 bg-gray-100 hover:bg-blue-400 text-black hover:text-white">
                 <Share2 className="w-4 h-4" />
                 Share
               </Button>
             </DialogTrigger>
-
             <DialogContent className="sm:max-w-md bg-amber-50">
               <DialogHeader>
                 <DialogTitle>Share this project</DialogTitle>
-                <DialogDescription>
-                  Copy the link below or invite collaborators.
-                </DialogDescription>
+                <DialogDescription>Copy the link below.</DialogDescription>
               </DialogHeader>
               <div className="flex items-center gap-2 mt-2">
-                <input
-                  type="text"
-                  readOnly
-                  value="https://yourapp.com/project/123"
-                  className="flex-1 border rounded-md px-3 py-2 text-sm"
-                />
-                <Button
-                  variant="default"
-                  onClick={() => navigator.clipboard.writeText("https://yourapp.com/project/123")}
-                >
+                <input type="text" readOnly value="https://yourapp.com/project/123" className="flex-1 border rounded-md px-3 py-2 text-sm" />
+                <Button onClick={() => navigator.clipboard.writeText("https://yourapp.com/project/123")}>
                   Copy
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
 
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 text-black bg-gray-100 hover:bg-blue-400 hover:text-white transition-colors duration-300"
-          >
+          <Button variant="outline" className="bg-gray-100">
             <AppWindow className="w-4 h-4" />
           </Button>
+
           {onLogout && (
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 text-black bg-gray-100 hover:bg-red-500 hover:text-white transition-colors duration-300"
-            onClick={onLogout}
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
-        )}
+            <Button variant="outline" className="bg-gray-100 hover:bg-red-500 hover:text-white" onClick={onLogout}>
+              <LogOut className="w-4 h-4" /> Logout
+            </Button>
+          )}
         </div>
 
-        
       </div>
 
-      {/* Bottom Left Controls */}
+
+      {/* Left */}
       <div className="fixed bottom-5 left-5 flex items-center gap-3 z-10">
         <div className="flex items-center gap-2 bg-gray-50 border rounded-full px-3 py-1 shadow-sm">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleZoomOut}>
-            <Minus className="w-4 h-4" />
-          </Button>
-          <span className="text-sm font-medium">{Math.round(zoom * 100)}%</span>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleZoomIn}>
-            <Plus className="w-4 h-4" />
-          </Button>
+          <Button size="icon" variant="ghost" onClick={handleZoomOut}><Minus /></Button>
+          <span className="text-sm">{Math.round(zoom * 100)}%</span>
+          <Button size="icon" variant="ghost" onClick={handleZoomIn}><Plus /></Button>
         </div>
+
         <div className="flex items-center gap-2 bg-gray-50 border rounded-full px-3 py-1 shadow-sm">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8"
-            onClick={handleUndo}
-            disabled={historyStep <= 0}
-          >
-            <Undo2 className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8"
-            onClick={handleRedo}
-            disabled={historyStep >= history.length - 1}
-          >
-            <Redo2 className="w-4 h-4" />
-          </Button>
+          <Button size="icon" variant="ghost" onClick={handleUndo} disabled={historyStep <= 0}><Undo2 /></Button>
+          <Button size="icon" variant="ghost" onClick={handleRedo} disabled={historyStep >= history.length - 1}><Redo2 /></Button>
         </div>
       </div>
 
-      {/* Bottom Right Controls */}
+
+      {/* Bottom Right */}
       <div className="fixed bottom-5 right-5 flex items-center gap-2 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-gray-50 border rounded-full shadow-sm text-indigo-600"
-        >
-          <ShieldCheck className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-gray-50 border rounded-full shadow-sm"
-        >
-          <HelpCircle className="w-4 h-4" />
-        </Button>
+        <Button size="icon" variant="ghost" className="bg-gray-50 border rounded-full"><ShieldCheck /></Button>
+        <Button size="icon" variant="ghost" className="bg-gray-50 border rounded-full"><HelpCircle /></Button>
       </div>
+
     </div>
   )
 }

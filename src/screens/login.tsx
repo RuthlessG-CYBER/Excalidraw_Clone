@@ -18,7 +18,7 @@ export default function LoginPage({
   onLogin,
   onSignupClick,
 }: {
-  onLogin?: (user: any) => void
+  onLogin?: (user: string) => void
   onSignupClick?: () => void
 }) {
   const [email, setEmail] = useState("")
@@ -28,26 +28,31 @@ export default function LoginPage({
   const [error, setError] = useState("")
 
   const handleLogin = async () => {
-    setError("")
-    setLoading(true)
+    setError("");
+    setLoading(true);
+
     try {
       const response = await fetch(`${API_URL}/api/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.message || "Invalid credentials")
+      const data = await response.json();
 
-      localStorage.setItem("token", data.token)
-      if (onLogin) onLogin(data.user)
-    } catch (err: any) {
-      setError(err.message || "Login failed")
+      if (!response.ok) throw new Error(data.message || "Invalid credentials");
+
+      localStorage.setItem("token", data.token);
+
+      if (onLogin) onLogin(data.user);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
 
   return (
     <div className="flex items-center justify-center w-full h-full">
