@@ -27,7 +27,6 @@ import {
   Trash2,
   Sparkles,
   Share2,
-  AppWindow,
   ShieldCheck,
   Undo2,
   Redo2,
@@ -272,9 +271,9 @@ const Home = ({ onLogout, user }: HomeProps) => {
             </DialogContent>
           </Dialog>
 
-          <Button variant="outline" className="bg-gray-100">
+          {/* <Button variant="outline" className="bg-gray-100">
             <AppWindow className="w-4 h-4" />
-          </Button>
+          </Button> */}
 
           {onLogout && (
             <Button variant="outline" className="bg-gray-100 hover:bg-red-500 hover:text-white" onClick={onLogout}>
