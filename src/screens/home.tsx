@@ -124,7 +124,7 @@ const Home = ({ onLogout }: HomeProps) => {
     };
 
     try {
-      const res = await fetch(`${API_URL}/api/save`, {
+      const res = await fetch(`${API_URL}/api/user/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(projectData)
